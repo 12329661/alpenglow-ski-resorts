@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Alpenglow — world ski-resort atlas
 
-## Getting Started
+A Next.js (App Router) + TypeScript + Tailwind + shadcn/ui site that explores
+499 ski resorts: an interactive map, a price-vs-terrain analysis, a sortable
+directory, and a two-resort comparison view. Charts are Recharts; data lives in
+Supabase.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The app reads a single table, **`resort`**, from the Supabase project in
+`.env.local`. It was created by a raw CSV import, so its columns are capitalised
+with spaces (`ID`, `Resort`, `Highest point`, …). `lib/data.ts` aliases them to
+snake_case in the `select`; the rest of the app never sees the raw names.
+
+The table needs a public-read RLS policy so the anon key can read it:
+
+```sql
+alter table public."resort" enable row level security;
+create policy "public read resort" on public."resort" for select using (true);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Run
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run dev      # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`npm run build && npm run start` for production. The home page uses ISR
+(`revalidate = 300`).
 
-## Learn More
+## Data notes
 
-To learn more about Next.js, take a look at the following resources:
+- Fields used: name, lat/long, country, continent, day-pass price, season,
+  highest/lowest lift-served point (→ summit elevation and vertical drop).
+- Rows with a placeholder `Price` of `0` are treated as unknown (`NULL`).
+- The `resort` table also carries slope counts, lift counts, snow cannons, and
+  yes/no flags for snowparks / night skiing / summer skiing / child-friendly —
+  not yet surfaced in the UI.
+- `resorts.csv` / `snow.csv` and `scripts/build-sql.mjs` are kept for reference
+  but are no longer wired into the app.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16 · React 19 · Tailwind CSS v4 · shadcn/ui (base-ui) · Recharts 3 ·
+`@supabase/supabase-js` · next-themes
