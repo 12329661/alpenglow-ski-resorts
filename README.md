@@ -1,5 +1,7 @@
 # Alpenglow — world ski-resort atlas
 
+**[Live Demo](https://alpenglow-ski-resorts.vercel.app/)**
+
 A Next.js (App Router) + TypeScript + Tailwind + shadcn/ui site that explores
 499 ski resorts: an interactive map, a price-vs-terrain analysis, a sortable
 directory, and a two-resort comparison view. Charts are Recharts; data lives in
